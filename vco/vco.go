@@ -14,20 +14,13 @@ type VCO struct {
 }
 
 func NewVCO(pwm tone.PWM, pin machine.Pin, scale Scale) VCO {
-	err := pwm.Configure(machine.PWMConfig{
-		Period: defaultPeriod,
-	})
-	if err != nil {
-		log.Fatal("pwm Configure error: ", err.Error())
-	}
-
-	speaker, err := tone.New(pwm, pin)
+	output, err := tone.New(pwm, pin)
 	if err != nil {
 		log.Fatalf("NewVCO(%v) error: %v", pin, err.Error())
 	}
 
 	return VCO{
-		output:      speaker,
+		output:      output,
 		scale:       scale,
 		currentNote: tone.Note(0),
 	}

@@ -68,3 +68,29 @@ func ReadVoltage() float64 {
 	read := ReadCV()
 	return MaxReadVoltage * (float64(read-MinCalibratedRead) / float64(MaxCalibratedRead-MinCalibratedRead))
 }
+
+// TODO: turn these into constructors and move definiton to script.
+func init() {
+	// Initialize the cv input GPIO as an analog input.
+	machine.InitADC()
+	cvInput = machine.ADC{Pin: CVInput}
+	cvInput.Configure(machine.ADCConfig{})
+
+	// Create an array of our cv outputs and configure for output.
+	cvOutputs = [8]machine.Pin{CV1, CV2, CV3, CV4, CV5, CV6, CV7, CV8}
+	for _, cv := range cvOutputs {
+		cv.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	}
+
+	// Configure each of the cv outputs with their PWM peripherial channel.
+	pwmOutputs = [8]PWM{
+		machine.PWM5, // GPIO27 peripherals: PWM5 channel B
+		machine.PWM6, // GPIO28 peripherals: PWM6 channel A
+		machine.PWM6, // GPIO29 peripherals: PWM6 channel B
+		machine.PWM0, // GPIO0  peripherals: PWM0 channel A
+		machine.PWM1, // GPIO3  peripherals: PWM1 channel B
+		machine.PWM2, // GPIO4  peripherals: PWM2 channel A
+		machine.PWM1, // GPIO2  peripherals: PWM1 channel A
+		machine.PWM0, // GPIO1  peripherals: PWM0 channel B
+	}
+}
