@@ -5,11 +5,11 @@ import (
 )
 
 const (
-	// The first midi note number for 0v. 36 = C2
-	MinNoteNum = 36
+	// The first midi note number. 24 = C1
+	MinNoteNum = 24
 
-	// The max midi note number from a range of 12 notes per octave * 5 octaves + root note 24.
-	MaxNoteNum = 12*5 + MinNoteNum
+	// The max midi note number. 108 = C7
+	MaxNoteNum = 108
 )
 
 var (
@@ -24,8 +24,12 @@ var (
 	Octave          = NewScale([]int{1})
 )
 
+// Scale is a slice of ints representing which of the 12 steps in an octave should be played.
+//
+// For example the numbers 1, 5, 8 would represent a Major Triad (C, E, G).
 type Scale []tone.Note
 
+// NewScale takes in a slice of ints in the range of 1..12 in length and creates a slice containing all the notes from those steps from C1 to C7.
 func NewScale(steps []int) Scale {
 	var (
 		scale Scale

@@ -7,13 +7,16 @@ import (
 	"tinygo.org/x/drivers/tone"
 )
 
+// VCO is a configured pwm cv output that can play the notes from the given Scale across 5 volts starting at the given root note.
 type VCO struct {
 	output      tone.Speaker
 	scale       Scale
+	rootNote    int
 	currentNote tone.Note
 }
 
-func NewVCO(pwm tone.PWM, pin machine.Pin, scale Scale) VCO {
+// NewVCO returns a constructed VCO for the given configuration parameters.
+func NewVCO(pwm tone.PWM, pin machine.Pin, scale Scale, rootNote tone.Note) VCO {
 	output, err := tone.New(pwm, pin)
 	if err != nil {
 		log.Fatalf("NewVCO(%v) error: %v", pin, err.Error())
@@ -22,6 +25,7 @@ func NewVCO(pwm tone.PWM, pin machine.Pin, scale Scale) VCO {
 	return VCO{
 		output:      output,
 		scale:       scale,
+		rootNote:    int(rootNote + 12), // Add offset to account for the inaccurate tone.Note values.
 		currentNote: tone.Note(0),
 	}
 }
@@ -41,10 +45,11 @@ func (vco *VCO) SendNote(note tone.Note) {
 	}
 }
 
-// NoteFromVoltage gets the midi note number from a range of notes.
+// NoteFromVoltage gets the note in scale corresponding to the current voltage.
 //
 // For example, 60 notes (12 notes per octave * 5 octaves), starting at note number 24 (C1).
-func NoteFromVoltage(v float64) tone.Note {
-	noteNum := int(v/MaxReadVoltage*MaxNoteNum) + MinNoteNum
+func (vco *VCO) NoteFromVoltage(v float64) tone.Note {
+	scaleNum := int(v / MaxReadVoltage * 60)
+	noteNum := scaleNum + vco.rootNote
 	return tone.Note(noteNum)
 }

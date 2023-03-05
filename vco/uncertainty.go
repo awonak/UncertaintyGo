@@ -83,6 +83,11 @@ func init() {
 	}
 
 	// Configure each of the cv outputs with their PWM peripherial channel.
+	//
+	// Note: PWM pins on the same peripherial will overwrite eachother.
+	// For example, cv out 2 (GPIO28) and cv out 3 (GPIO29) both use PWM6,
+	// so whenever you set the frequency of one, the other will update to
+	// that same frequency too.
 	pwmOutputs = [8]PWM{
 		machine.PWM5, // GPIO27 peripherals: PWM5 channel B
 		machine.PWM6, // GPIO28 peripherals: PWM6 channel A
