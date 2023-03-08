@@ -4,9 +4,9 @@ import (
 	"log"
 	"time"
 
-	uncertainty "github.com/awonak/UncertaintyGo"
-
 	"tinygo.org/x/drivers/tone"
+
+	uncertainty "github.com/awonak/UncertaintyGo"
 )
 
 // Enable to print serial monitoring log messages.

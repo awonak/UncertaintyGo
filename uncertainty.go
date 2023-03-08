@@ -1,4 +1,4 @@
-package europi // import europi "github.com/awonak/UncertaintyGo"
+package uncertainty // import uncertainty "github.com/awonak/UncertaintyGo"
 
 import (
 	"log"

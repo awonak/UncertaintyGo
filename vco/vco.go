@@ -4,9 +4,9 @@ import (
 	"log"
 	"machine"
 
-	uncertainty "github.com/awonak/UncertaintyGo"
-
 	"tinygo.org/x/drivers/tone"
+
+	uncertainty "github.com/awonak/UncertaintyGo"
 )
 
 // NoteRange represents the number of notes allowed in a 5v range.
