@@ -1,4 +1,4 @@
-# 3 voice quantized digital vco
+# 3 Voice Quantized Digital VCO
 
 The script is using the [tone package](https://pkg.go.dev/tinygo.org/x/drivers/tone) to create 3 configurable digital square wave oscillators. Each oscillator can be quantized to a melodic scale and can set a root note for stacking chords or creating sub oscillators.
 
@@ -44,7 +44,7 @@ roots = [3]tone.Note{
 
 ## Building & Flashing
 
-From the root directory of the project, use the `tinygo flash` command while Uncertainty USB is connected to compile the script and copy it to your Uncertainty.
+From the root directory of the project, use the `tinygo flash` command while Uncertainty USB is connected to compile and flash the script.
 
 ```shell
 tinygo flash --target xiao-rp2040 ./vco
