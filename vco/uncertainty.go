@@ -35,10 +35,6 @@ var (
 	cvInput    machine.ADC
 	cvOutputs  [8]machine.Pin
 	pwmOutputs [8]PWM
-
-	// We need a rather high frequency to achieve a stable cv ouput, which means we need a rather low duty cycle period.
-	// Set a period of 500ns.
-	defaultPeriod uint64 = 1e9 / 500
 )
 
 // PWM is the interface necessary for configuring a cv output for PWM.
