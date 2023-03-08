@@ -7,7 +7,13 @@ import (
 	"tinygo.org/x/drivers/tone"
 )
 
-// VCO is a configured pwm cv output that can play the notes from the given Scale across 5 volts starting at the given root note.
+// NoteRange represents the number of notes allowed in a 5v range.
+// For example, 60 notes (12 notes per octave * 5 octaves), starting at note
+// number 24 (C1).
+const NoteRange = 60
+
+// VCO is a configured pwm cv output that can play the notes from the given
+// Scale across 5 volts starting at the given root note when 0v present.
 type VCO struct {
 	output      tone.Speaker
 	scale       Scale
@@ -23,14 +29,16 @@ func NewVCO(pwm tone.PWM, pin machine.Pin, scale Scale, rootNote tone.Note) VCO 
 	}
 
 	return VCO{
-		output:      output,
-		scale:       scale,
-		rootNote:    int(rootNote + 12), // Add offset to account for the inaccurate tone.Note values.
-		currentNote: tone.Note(0),
+		output: output,
+		scale:  scale,
+		// Add octave offset to account for the inaccurate tone.Note values.
+		rootNote:    int(rootNote + 12),
+		currentNote: tone.Note(rootNote + 12),
 	}
 }
 
-// SendNote will check if the received note is present in the current vco scale and update the vco frequency if so.
+// SendNote will check if the received note is present in the current vco
+// scale and update the vco frequency if so.
 func (vco *VCO) SendNote(note tone.Note) {
 	if note == vco.currentNote {
 		return
@@ -47,9 +55,10 @@ func (vco *VCO) SendNote(note tone.Note) {
 
 // NoteFromVoltage gets the note in scale corresponding to the current voltage.
 //
-// For example, 60 notes (12 notes per octave * 5 octaves), starting at note number 24 (C1).
+// For example, 60 notes (12 notes per octave * 5 octaves), starting at note
+// number 24 (C1).
 func (vco *VCO) NoteFromVoltage(v float64) tone.Note {
-	scaleNum := int(v / MaxReadVoltage * 60)
+	scaleNum := int(v / MaxReadVoltage * NoteRange)
 	noteNum := scaleNum + vco.rootNote
 	return tone.Note(noteNum)
 }

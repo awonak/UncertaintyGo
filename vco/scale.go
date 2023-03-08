@@ -8,15 +8,18 @@ const (
 	// The first midi note number. 24 = C1
 	MinNoteNum = 24
 
-	// The max midi note number. 108 = C7
+	// The max midi note number. 108 = C8
 	MaxNoteNum = 108
 )
 
 var (
 	// A collection of common melodic scales.
+	// Scales are represented as the semitone steps that should played in that scale.
+	// For example the numbers 1, 5, 8 would represent a Major Triad (C, E, G).
 	Chromatic       = NewScale([]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12})
 	Major           = NewScale([]int{1, 3, 5, 6, 8, 10, 12})
 	Minor           = NewScale([]int{1, 3, 4, 6, 8, 9, 11})
+	Blues           = NewScale([]int{1, 4, 6, 7, 8, 11})
 	MajorPentatonic = NewScale([]int{1, 3, 5, 8, 10})
 	MinorPentatonic = NewScale([]int{1, 4, 6, 8, 11})
 	MajorTriad      = NewScale([]int{1, 5, 8})
