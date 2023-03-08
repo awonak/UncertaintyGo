@@ -1,8 +1,10 @@
-# Uncertainty with TinyGo
+# Uncertainty
 
-This is my collection of scripts I have written for the [Uncertainty](https://oamodular.org/discount/AWONAK?redirect=%2Fproducts%2Funcertainty) eurorack module using TinyGo.
+[![Go Reference](https://pkg.go.dev/badge/github.com/awonak/UncertaintyGo.svg)](https://pkg.go.dev/github.com/awonak/UncertaintyGo)
 
-## Scripts
+Firmware and scripts written for the [Uncertainty](https://oamodular.org/discount/AWONAK?redirect=%2Fproducts%2Funcertainty) eurorack module using [TinyGo](https://tinygo.org/).
+
+### Scripts
 
 ⚡ **[Voltage Gates](voltage_gates/main.go)**
 
