@@ -4,14 +4,17 @@ This is my collection of scripts I have written for the Uncertainty eurorack mod
 
 ## Scripts
 
-[voltage gates](voltage_gates/main.go)
+⚡ **[voltage gates](voltage_gates/main.go)**
 
 This one was taken directly from the main Uncertainty repo and rewritten in TinyGo. https://github.com/oamodular/uncertainty#coding-the-code
 
-[3 voice quantized digital vco](vco/)
+Demo video: [https://youtu.be/PLs5O3ZkTm0](https://youtu.be/PLs5O3ZkTm0)
 
-3 configurable VCO's using PWM to create a square wave and quantized to reduce noise/jitter when tuning the oscillators.
+🎹 **[3 voice quantized digital vco](vco/)**
 
+The script is using the [tone package](https://pkg.go.dev/tinygo.org/x/drivers/tone) to create 3 configurable digital square wave oscillators. Each oscillator can be quantized to a melodic scale and can set a root note for stacking chords or creating sub oscillators.
+
+Demo video: [https://youtu.be/f9nFkzrO6-8](https://youtu.be/f9nFkzrO6-8)
 
 # Getting started
 
@@ -29,7 +32,7 @@ Install the TinyGo VSCode plugin
 
 ## Build the example
 
-Use the `tinygo flash` command while connected to the usb port to compile the script and copy it to your Uncertainty.
+From the root directory of the project, use the `tinygo flash` command while Uncertainty USB is connected to compile the script and copy it to your Uncertainty.
 
 ```shell
 tinygo flash --target xiao-rp2040 ./voltage_gates
