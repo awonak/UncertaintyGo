@@ -1,6 +1,7 @@
-package main
+package europi // import europi "github.com/awonak/UncertaintyGo"
 
 import (
+	"log"
 	"machine"
 	"math"
 )
@@ -31,6 +32,9 @@ const (
 )
 
 var (
+	// The array of 8 configured cv outputs
+	Outputs [8]Outputer
+
 	// Create package global variables for the cv input and outputs.
 	cvInput    machine.ADC
 	cvOutputs  [8]machine.Pin
@@ -44,6 +48,38 @@ type PWM interface {
 	Top() uint32
 	Set(channel uint8, value uint32)
 	SetPeriod(period uint64) error
+}
+
+type Outputer interface {
+	Pin() machine.Pin
+	PWM() PWM
+}
+
+type Output struct {
+	pin machine.Pin
+	pwm PWM
+	ch  uint8
+}
+
+func (o *Output) Pin() machine.Pin {
+	return o.pin
+}
+
+func (o *Output) PWM() PWM {
+	return o.pwm
+}
+
+func newOutput(pin machine.Pin, pwm PWM) *Output {
+	pin.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	ch, err := pwm.Channel(pin)
+	if err != nil {
+		log.Fatal("pwm Channel error: ", err.Error())
+	}
+	return &Output{
+		pin: pin,
+		pwm: pwm,
+		ch:  ch,
+	}
 }
 
 // ReadCV will return the cv input scaled to 0v-5v as an int with 0 for 0v and 32768 for 5v.
@@ -65,7 +101,6 @@ func ReadVoltage() float64 {
 	return MaxReadVoltage * (float64(read-MinCalibratedRead) / float64(MaxCalibratedRead-MinCalibratedRead))
 }
 
-// TODO: turn these into constructors and move definiton to script.
 func init() {
 	// Initialize the cv input GPIO as an analog input.
 	machine.InitADC()
@@ -74,9 +109,6 @@ func init() {
 
 	// Create an array of our cv outputs and configure for output.
 	cvOutputs = [8]machine.Pin{CV1, CV2, CV3, CV4, CV5, CV6, CV7, CV8}
-	for _, cv := range cvOutputs {
-		cv.Configure(machine.PinConfig{Mode: machine.PinOutput})
-	}
 
 	// Configure each of the cv outputs with their PWM peripherial channel.
 	//
@@ -93,5 +125,10 @@ func init() {
 		machine.PWM2, // GPIO4  peripherals: PWM2 channel A
 		machine.PWM1, // GPIO2  peripherals: PWM1 channel A
 		machine.PWM0, // GPIO1  peripherals: PWM0 channel B
+	}
+
+	// Create our 8 configured outputs with Pin and PWM configurations per output.
+	for i, cv := range cvOutputs {
+		Outputs[i] = newOutput(cv, pwmOutputs[i])
 	}
 }

@@ -1,4 +1,4 @@
-module uncertainty
+module github.com/awonak/UncertaintyGo
 
 go 1.19
 

@@ -4,6 +4,8 @@ import (
 	"log"
 	"machine"
 
+	uncertainty "github.com/awonak/UncertaintyGo"
+
 	"tinygo.org/x/drivers/tone"
 )
 
@@ -58,7 +60,7 @@ func (vco *VCO) SendNote(note tone.Note) {
 // For example, 60 notes (12 notes per octave * 5 octaves), starting at note
 // number 24 (C1).
 func (vco *VCO) NoteFromVoltage(v float64) tone.Note {
-	scaleNum := int(v / MaxReadVoltage * NoteRange)
+	scaleNum := int(v / uncertainty.MaxReadVoltage * NoteRange)
 	noteNum := scaleNum + vco.rootNote
 	return tone.Note(noteNum)
 }

@@ -4,6 +4,8 @@ import (
 	"log"
 	"time"
 
+	uncertainty "github.com/awonak/UncertaintyGo"
+
 	"tinygo.org/x/drivers/tone"
 )
 
@@ -11,10 +13,12 @@ import (
 const Debug = false
 
 var (
-	// User configurable variables for VCOs.
+	// An array of VCOs bound to CV Outputs.
+	vcos [3]VCO
+
+	// Configurable variables for VCOs. Values set in configure.go.
 	scales [3]Scale
 	roots  [3]tone.Note
-	vcos   [3]VCO
 )
 
 func main() {
@@ -25,24 +29,29 @@ func main() {
 		log.Print("Ready...")
 	}
 
-	// Initialize a collection of PWM VCOs bound to a scale and root note starting at 0v.
-	vcos = [3]VCO{
-		NewVCO(pwmOutputs[1], cvOutputs[1], scales[0], roots[0]),
-		NewVCO(pwmOutputs[3], cvOutputs[3], scales[1], roots[1]),
-		NewVCO(pwmOutputs[5], cvOutputs[5], scales[2], roots[2]),
+	// Initialize a collection of VCOs bound to a CV Output and provide the
+	// configured scale and root note for each VCO.
+	for i, output := range []uncertainty.Outputer{
+		uncertainty.Outputs[1],
+		uncertainty.Outputs[3],
+		uncertainty.Outputs[5],
+	} {
+		vcos[i] = NewVCO(output.PWM(), output.Pin(), scales[i], roots[i])
 	}
 
 	// Main program loop.
 	for {
-		voltage := ReadVoltage()
+		voltage := uncertainty.ReadVoltage()
 		for _, vco := range vcos {
 			newNote := vco.NoteFromVoltage(voltage)
 			vco.SendNote(newNote)
 		}
 
 		if Debug {
+			read := uncertainty.ReadCV()
+			volts := uncertainty.ReadVoltage()
 			note := vcos[0].NoteFromVoltage(voltage)
-			log.Printf("readCV: %d\tvoltage: %f\tnote: %v\n", ReadCV(), ReadVoltage(), note)
+			log.Printf("readCV: %d\tvoltage: %f\tnote: %v\n", read, volts, note)
 		}
 
 		time.Sleep(2 * time.Millisecond)
