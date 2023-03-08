@@ -1,6 +1,6 @@
 # Uncertainty with TinyGo
 
-This is my collection of scripts I have written for the Uncertainty eurorack module using TinyGo.
+This is my collection of scripts I have written for the [Uncertainty](https://oamodular.org/discount/AWONAK?redirect=%2Fproducts%2Funcertainty) eurorack module using TinyGo.
 
 ## Scripts
 
