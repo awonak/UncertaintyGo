@@ -5,6 +5,8 @@ import (
 	"machine"
 
 	"tinygo.org/x/drivers/tone"
+
+	uncertainty "github.com/awonak/UncertaintyGo"
 )
 
 // NoteRange represents the number of notes allowed in a 5v range.
@@ -58,7 +60,7 @@ func (vco *VCO) SendNote(note tone.Note) {
 // For example, 60 notes (12 notes per octave * 5 octaves), starting at note
 // number 24 (C1).
 func (vco *VCO) NoteFromVoltage(v float64) tone.Note {
-	scaleNum := int(v / MaxReadVoltage * NoteRange)
+	scaleNum := int(v / uncertainty.MaxReadVoltage * NoteRange)
 	noteNum := scaleNum + vco.rootNote
 	return tone.Note(noteNum)
 }
