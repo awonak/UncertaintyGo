@@ -33,7 +33,7 @@ const (
 
 var (
 	// The array of 8 configured cv outputs
-	Outputs [8]Outputer
+	Outputs [8]*Output
 
 	// Create package global variables for the cv input and outputs.
 	cvInput    machine.ADC
@@ -50,23 +50,18 @@ type PWM interface {
 	SetPeriod(period uint64) error
 }
 
-type Outputer interface {
-	Pin() machine.Pin
-	PWM() PWM
-}
-
 type Output struct {
-	pin machine.Pin
-	pwm PWM
+	Pin machine.Pin
+	PWM PWM
 	ch  uint8
 }
 
-func (o *Output) Pin() machine.Pin {
-	return o.pin
+func (o *Output) High() {
+	o.Pin.High()
 }
 
-func (o *Output) PWM() PWM {
-	return o.pwm
+func (o *Output) Low() {
+	o.Pin.Low()
 }
 
 func newOutput(pin machine.Pin, pwm PWM) *Output {
@@ -75,9 +70,10 @@ func newOutput(pin machine.Pin, pwm PWM) *Output {
 	if err != nil {
 		log.Fatal("pwm Channel error: ", err.Error())
 	}
+
 	return &Output{
-		pin: pin,
-		pwm: pwm,
+		Pin: pin,
+		PWM: pwm,
 		ch:  ch,
 	}
 }
