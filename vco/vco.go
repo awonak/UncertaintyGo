@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"machine"
 
 	"tinygo.org/x/drivers/tone"
 
@@ -17,22 +16,22 @@ const NoteRange = 60
 // VCO is a configured pwm cv output that can play the notes from the given
 // Scale across 5 volts starting at the given root note when 0v present.
 type VCO struct {
-	output      tone.Speaker
+	speaker     tone.Speaker
 	scale       Scale
 	rootNote    int
 	currentNote tone.Note
 }
 
 // NewVCO returns a constructed VCO for the given configuration parameters.
-func NewVCO(pwm tone.PWM, pin machine.Pin, scale Scale, rootNote tone.Note) VCO {
-	output, err := tone.New(pwm, pin)
+func NewVCO(output *uncertainty.Output, scale Scale, rootNote tone.Note) VCO {
+	speaker, err := tone.New(output.PWM, output.Pin)
 	if err != nil {
-		log.Fatalf("NewVCO(%v) error: %v", pin, err.Error())
+		log.Fatalf("NewVCO(%v) error: %v", output, err.Error())
 	}
 
 	return VCO{
-		output: output,
-		scale:  scale,
+		speaker: speaker,
+		scale:   scale,
 		// Add octave offset to account for the inaccurate tone.Note values.
 		rootNote:    int(rootNote + 12),
 		currentNote: tone.Note(rootNote + 12),
@@ -49,7 +48,7 @@ func (vco *VCO) SendNote(note tone.Note) {
 	// Check if new note is in the quantized scale. If so, set the note.
 	for _, n := range vco.scale {
 		if note == n {
-			vco.output.SetNote(note)
+			vco.speaker.SetNote(note)
 			vco.currentNote = note
 		}
 	}
