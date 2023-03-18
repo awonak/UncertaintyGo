@@ -50,22 +50,24 @@ type PWM interface {
 	SetPeriod(period uint64) error
 }
 
+// Output represents a single cv output.
 type Output struct {
 	Pin machine.Pin
 	PWM PWM
 	ch  uint8
 }
 
+// High will set the current output to a high voltage of roughly 5v.
 func (o *Output) High() {
 	o.Pin.High()
 }
 
+// Low will set the current output to a low voltage of roughly 0v.
 func (o *Output) Low() {
 	o.Pin.Low()
 }
 
 func newOutput(pin machine.Pin, pwm PWM) *Output {
-	pin.Configure(machine.PinConfig{Mode: machine.PinOutput})
 	ch, err := pwm.Channel(pin)
 	if err != nil {
 		log.Fatal("pwm Channel error: ", err.Error())
@@ -78,8 +80,8 @@ func newOutput(pin machine.Pin, pwm PWM) *Output {
 	}
 }
 
-// ReadCV will return the cv input scaled to 0v-5v as an int with 0 for 0v and 32768 for 5v.
-func ReadCV() int {
+// Read will return the cv input scaled to 0v-5v as an int with 0 for 0v and 32768 for 5v.
+func Read() int {
 	var sum int
 	for i := 0; i < ReadSamples; i++ {
 		read := int(cvInput.Get()) - math.MaxInt16
@@ -93,7 +95,7 @@ func ReadCV() int {
 
 // ReadVoltage will return the cv input scaled to 0v-5v as a float with 0.0 for 0v and 5.0 for 5v.
 func ReadVoltage() float64 {
-	read := ReadCV()
+	read := Read()
 	return MaxReadVoltage * (float64(read-MinCalibratedRead) / float64(MaxCalibratedRead-MinCalibratedRead))
 }
 
@@ -126,5 +128,6 @@ func init() {
 	// Create our 8 configured outputs with Pin and PWM configurations per output.
 	for i, cv := range cvOutputs {
 		Outputs[i] = newOutput(cv, pwmOutputs[i])
+		Outputs[i].Pin.Configure(machine.PinConfig{Mode: machine.PinOutput})
 	}
 }

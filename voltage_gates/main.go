@@ -14,7 +14,7 @@ func main() {
 	// Main loop.
 	for {
 		// Read the cv input clipped to a 0-5v range.
-		read := uncertainty.ReadCV()
+		read := uncertainty.Read()
 
 		// Read the cv input and scale down voltage to select one of the 8 cv
 		// ouputs to activate.

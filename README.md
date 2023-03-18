@@ -4,6 +4,9 @@
 
 Firmware and scripts written for the [Uncertainty](https://oamodular.org/discount/AWONAK?redirect=%2Fproducts%2Funcertainty) eurorack module using [TinyGo](https://tinygo.org/).
 
+> **Note**
+> The Uncertainty package is under active develoment and does not guarantee backwards compatibity across commits.
+
 ### Scripts
 
 ⚡ **[Voltage Gates](voltage_gates/main.go)**
@@ -64,7 +67,7 @@ Add the TinyGo flash command as your default build task:
 Ctrl + Shift + P > Tasks: Configure Default Build Task
 ```
 
-Use the following example task configuration to set tinygo flash as your default build command:
+Use the following example task configuration to set tinygo flash as your default build command, which will build and flash the package of the current open file:
 
 ```json
 {
@@ -73,7 +76,7 @@ Use the following example task configuration to set tinygo flash as your default
         {
             "label": "tinygo flash",
             "type": "shell",
-            "command": "tinygo flash --target xiao-rp2040 ./voltage_gates",
+            "command": "tinygo flash --target xiao-rp2040 ${fileDirname}",
             "group": {
                 "kind": "build",
                 "isDefault": true
