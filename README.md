@@ -23,7 +23,7 @@ Demo video: [https://youtu.be/f9nFkzrO6-8](https://youtu.be/f9nFkzrO6-8)
 
 🌊 **[8 △ LFOs](lfo/)**
 
-Eight triangle LFOs, each twice the period of the last. The cv input will nudge the LFO speed a little bit. The first output can reach a max frequency of about 1hz, while the last output will take about 4 minutes to complete a full cycle.
+Eight triangle LFOs, each roughly twice the period of the last. The cv input will nudge the LFO speed a little bit. The first output can reach a max frequency of about 1hz, while the last output will take about 4 minutes to complete a full cycle. The LFOs are not in sync and each will drift over time, creating a bit of... uncertainty.
 
 Demo video: [https://youtu.be/o0pNMU3wgn0](https://youtu.be/o0pNMU3wgn0)
 
