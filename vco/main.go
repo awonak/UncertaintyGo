@@ -8,13 +8,15 @@ import (
 	uncertainty "github.com/awonak/UncertaintyGo"
 )
 
+const voices int = 3
+
 var (
 	// An array of VCOs bound to CV Outputs.
-	vcos [3]VCO
+	vcos [voices]VCO
 
 	// Configurable variables for VCOs. Values set in configure.go.
-	scales [3]Scale
-	roots  [3]tone.Note
+	scales [voices]Scale
+	roots  [voices]tone.Note
 )
 
 func main() {
@@ -34,7 +36,7 @@ func main() {
 		voltage := uncertainty.ReadVoltage()
 
 		for _, vco := range vcos {
-			newNote := vco.NoteFromVoltage(voltage)
+			newNote := vco.NoteFromVoltage(float64(voltage))
 			vco.SendNote(newNote)
 		}
 

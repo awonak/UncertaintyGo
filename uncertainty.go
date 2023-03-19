@@ -28,17 +28,23 @@ const (
 	MaxCalibratedRead = 29582
 
 	// Upper limit of voltage read by the cv input.
-	MaxReadVoltage float64 = 5
+	MaxReadVoltage float32 = 5.0
+
+	// Min and Max voltage range available to be used by the cv output.
+	MinVoltage float32 = 0.0
+	MaxVoltage float32 = 5.0
+
+	// The default PWM frequncy is 100khz (1 second in nanoseconds / 100k).
+	// This results in a period of 10,000ns per cycle.
+	defaultPeriod uint64 = 1e9 / 100_000
 )
 
 var (
 	// The array of 8 configured cv outputs
 	Outputs [8]*Output
 
-	// Create package global variables for the cv input and outputs.
-	cvInput    machine.ADC
-	cvOutputs  [8]machine.Pin
-	pwmOutputs [8]PWM
+	// Package private variable for the cv input peripherial.
+	cvInput machine.ADC
 )
 
 // PWM is the interface necessary for configuring a cv output for PWM.
@@ -59,25 +65,36 @@ type Output struct {
 
 // High will set the current output to a high voltage of roughly 5v.
 func (o *Output) High() {
-	o.Pin.High()
+	o.PWM.Set(o.ch, o.PWM.Top())
 }
 
 // Low will set the current output to a low voltage of roughly 0v.
 func (o *Output) Low() {
-	o.Pin.Low()
+	o.PWM.Set(o.ch, 0)
 }
 
-func newOutput(pin machine.Pin, pwm PWM) *Output {
-	ch, err := pwm.Channel(pin)
+// Voltage sets the current output voltage within a range of 0.0 to 5.0.
+func (o *Output) Voltage(v float32) {
+	v = clamp(v, MinVoltage, MaxVoltage)
+	cv := (v / MaxVoltage) * float32(o.PWM.Top())
+	o.PWM.Set(o.ch, uint32(cv))
+}
+
+func NewOutput(pin machine.Pin, pwm PWM) *Output {
+	// Configure the PWM with the default period.
+	err := pwm.Configure(machine.PWMConfig{
+		Period: defaultPeriod,
+	})
 	if err != nil {
-		log.Fatal("pwm Channel error: ", err.Error())
+		log.Fatalf("pwm Configure(%v) error: %v", pin, err.Error())
 	}
 
-	return &Output{
-		Pin: pin,
-		PWM: pwm,
-		ch:  ch,
+	ch, err := pwm.Channel(pin)
+	if err != nil {
+		log.Fatalf("pwm Channel(%v) error: %v", pin, err.Error())
 	}
+
+	return &Output{pin, pwm, ch}
 }
 
 // Read will return the cv input scaled to 0v-5v as an int with 0 for 0v and 32768 for 5v.
@@ -94,9 +111,23 @@ func Read() int {
 }
 
 // ReadVoltage will return the cv input scaled to 0v-5v as a float with 0.0 for 0v and 5.0 for 5v.
-func ReadVoltage() float64 {
+func ReadVoltage() float32 {
 	read := Read()
-	return MaxReadVoltage * (float64(read-MinCalibratedRead) / float64(MaxCalibratedRead-MinCalibratedRead))
+	return MaxReadVoltage * (float32(read-MinCalibratedRead) / float32(MaxCalibratedRead-MinCalibratedRead))
+}
+
+type clampable interface {
+	~uint8 | ~uint16 | ~int | ~float32
+}
+
+func clamp[V clampable](value, low, high V) V {
+	if value >= high {
+		return high
+	}
+	if value <= low {
+		return low
+	}
+	return value
 }
 
 func init() {
@@ -105,29 +136,15 @@ func init() {
 	cvInput = machine.ADC{Pin: CVInput}
 	cvInput.Configure(machine.ADCConfig{})
 
-	// Create an array of our cv outputs and configure for output.
-	cvOutputs = [8]machine.Pin{CV1, CV2, CV3, CV4, CV5, CV6, CV7, CV8}
-
-	// Configure each of the cv outputs with their PWM peripherial channel.
-	//
-	// Note: PWM pins on the same peripherial will overwrite eachother.
-	// For example, cv out 2 (GPIO28) and cv out 3 (GPIO29) both use PWM6,
-	// so whenever you set the frequency of one, the other will update to
-	// that same frequency too.
-	pwmOutputs = [8]PWM{
-		machine.PWM5, // GPIO27 peripherals: PWM5 channel B
-		machine.PWM6, // GPIO28 peripherals: PWM6 channel A
-		machine.PWM6, // GPIO29 peripherals: PWM6 channel B
-		machine.PWM0, // GPIO0  peripherals: PWM0 channel A
-		machine.PWM1, // GPIO3  peripherals: PWM1 channel B
-		machine.PWM2, // GPIO4  peripherals: PWM2 channel A
-		machine.PWM1, // GPIO2  peripherals: PWM1 channel A
-		machine.PWM0, // GPIO1  peripherals: PWM0 channel B
-	}
-
-	// Create our 8 configured outputs with Pin and PWM configurations per output.
-	for i, cv := range cvOutputs {
-		Outputs[i] = newOutput(cv, pwmOutputs[i])
-		Outputs[i].Pin.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	// Create 8 configured outputs with Pin and PWM configurations per output.
+	Outputs = [8]*Output{
+		NewOutput(CV1, machine.PWM5), // GPIO27 peripherals: PWM5 channel B
+		NewOutput(CV2, machine.PWM6), // GPIO28 peripherals: PWM6 channel A
+		NewOutput(CV3, machine.PWM6), // GPIO29 peripherals: PWM6 channel B
+		NewOutput(CV4, machine.PWM0), // GPIO0  peripherals: PWM0 channel A
+		NewOutput(CV5, machine.PWM1), // GPIO3  peripherals: PWM1 channel B
+		NewOutput(CV6, machine.PWM2), // GPIO4  peripherals: PWM2 channel A
+		NewOutput(CV7, machine.PWM1), // GPIO2  peripherals: PWM1 channel A
+		NewOutput(CV8, machine.PWM0), // GPIO1  peripherals: PWM0 channel B
 	}
 }
