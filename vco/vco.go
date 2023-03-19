@@ -24,6 +24,9 @@ type VCO struct {
 
 // NewVCO returns a constructed VCO for the given configuration parameters.
 func NewVCO(output *uncertainty.Output, scale Scale, rootNote tone.Note) VCO {
+	// Set PWM frequency very high for best audio rate quality.
+	output.PWM.SetPeriod(uint64(1e9 / 500))
+
 	speaker, err := tone.New(output.PWM, output.Pin)
 	if err != nil {
 		log.Fatalf("NewVCO(%v) error: %v", output, err.Error())
@@ -59,7 +62,7 @@ func (vco *VCO) SendNote(note tone.Note) {
 // For example, 60 notes (12 notes per octave * 5 octaves), starting at note
 // number 24 (C1).
 func (vco *VCO) NoteFromVoltage(v float64) tone.Note {
-	scaleNum := int(v / uncertainty.MaxReadVoltage * NoteRange)
+	scaleNum := int(v / float64(uncertainty.MaxReadVoltage) * NoteRange)
 	noteNum := scaleNum + vco.rootNote
 	return tone.Note(noteNum)
 }
