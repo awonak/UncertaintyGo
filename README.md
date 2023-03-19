@@ -21,6 +21,13 @@ The script is using the [tone package](https://pkg.go.dev/tinygo.org/x/drivers/t
 
 Demo video: [https://youtu.be/f9nFkzrO6-8](https://youtu.be/f9nFkzrO6-8)
 
+🌊 **[8 △ LFOs](lfo/)**
+
+Eight triangle LFOs, each twice the period of the last. The cv input will nudge the LFO speed a little bit. The first output can reach a max frequency of about 1hz, while the last output will take about 4 minutes to complete a full cycle.
+
+Demo video: [https://youtu.be/o0pNMU3wgn0](https://youtu.be/o0pNMU3wgn0)
+
+
 # Getting started
 
 Install Go
