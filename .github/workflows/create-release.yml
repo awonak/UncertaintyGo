@@ -25,10 +25,10 @@ jobs:
 
     - name: Build and generate uf2 files for each script
       run: |
-        tinygo build -target=xiao-rp2040 -o uncertainty-${{env.GITHUB_REF_NAME}}_burst.uf2 .\burst\
-        tinygo build -target=xiao-rp2040 -o uncertainty-${{env.GITHUB_REF_NAME}}_lfo.uf2 .\lfo\
-        tinygo build -target=xiao-rp2040 -o uncertainty-${{env.GITHUB_REF_NAME}}_vco.uf2 .\vco\
-        tinygo build -target=xiao-rp2040 -o uncertainty-${{env.GITHUB_REF_NAME}}_voltage_gates.uf2 .\voltage_gates\
+        tinygo build -target=xiao-rp2040 -o uncertainty-${{env.GITHUB_REF_NAME}}_burst.uf2 ./burst
+        tinygo build -target=xiao-rp2040 -o uncertainty-${{env.GITHUB_REF_NAME}}_lfo.uf2 ./lfo
+        tinygo build -target=xiao-rp2040 -o uncertainty-${{env.GITHUB_REF_NAME}}_vco.uf2 ./vco
+        tinygo build -target=xiao-rp2040 -o uncertainty-${{env.GITHUB_REF_NAME}}_voltage_gates.uf2 ./voltage_gates
 
     - name: Create github release
       uses: "marvinpinto/action-automatic-releases@v1.2.1"
