@@ -19,7 +19,7 @@ const (
 	CV8     = machine.GPIO1
 
 	// Number of times to read analog input for an average reading.
-	ReadSamples = 500
+	ReadSamples = 25
 
 	// Calibrated average min read uint16 voltage within a 0-5v range.
 	MinCalibratedRead = 415
@@ -63,23 +63,6 @@ type Output struct {
 	ch  uint8
 }
 
-// High will set the current output to a high voltage of roughly 5v.
-func (o *Output) High() {
-	o.PWM.Set(o.ch, o.PWM.Top())
-}
-
-// Low will set the current output to a low voltage of roughly 0v.
-func (o *Output) Low() {
-	o.PWM.Set(o.ch, 0)
-}
-
-// Voltage sets the current output voltage within a range of 0.0 to 5.0.
-func (o *Output) Voltage(v float32) {
-	v = clamp(v, MinVoltage, MaxVoltage)
-	cv := (v / MaxVoltage) * float32(o.PWM.Top())
-	o.PWM.Set(o.ch, uint32(cv))
-}
-
 func NewOutput(pin machine.Pin, pwm PWM) *Output {
 	// Configure the PWM with the default period.
 	err := pwm.Configure(machine.PWMConfig{
@@ -97,7 +80,30 @@ func NewOutput(pin machine.Pin, pwm PWM) *Output {
 	return &Output{pin, pwm, ch}
 }
 
-// Read will return the cv input scaled to 0v-5v as an int with 0 for 0v and 32768 for 5v.
+// High will set the current output to a high voltage of roughly 5v.
+func (o *Output) High() {
+	o.PWM.Set(o.ch, o.PWM.Top())
+}
+
+// Low will set the current output to a low voltage of roughly 0v.
+func (o *Output) Low() {
+	o.PWM.Set(o.ch, 0)
+}
+
+// Voltage sets the current output voltage within a range of 0.0 to 5.0.
+func (o *Output) Voltage(v float32) {
+	v = Clamp(v, MinVoltage, MaxVoltage)
+	cv := (v / MaxVoltage) * float32(o.PWM.Top())
+	o.PWM.Set(o.ch, uint32(cv))
+}
+
+// Value sets the current output voltage within a range of 0 to 32767.
+func (o *Output) Value(v int) {
+	v = Clamp(v, 0, math.MaxInt16)
+	o.PWM.Set(o.ch, uint32(v))
+}
+
+// Read will return the cv input scaled to 0v-5v as an int with 0 for 0v and 32767 for 5v.
 func Read() int {
 	var sum int
 	for i := 0; i < ReadSamples; i++ {
@@ -120,7 +126,8 @@ type clampable interface {
 	~uint8 | ~uint16 | ~int | ~float32
 }
 
-func clamp[V clampable](value, low, high V) V {
+// Clamp will return the given value within the given high and low range.
+func Clamp[V clampable](value, low, high V) V {
 	if value >= high {
 		return high
 	}

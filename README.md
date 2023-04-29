@@ -27,6 +27,11 @@ Eight triangle LFOs, each roughly twice the period of the last. The cv input wil
 
 Demo video: [https://youtu.be/o0pNMU3wgn0](https://youtu.be/o0pNMU3wgn0)
 
+🌋 **[Burst Generator](burst/)**
+
+Excite the digital input with an attenuated trigger to generate even pulse width bursts from each of the 8 outputs. One pulse per output, so output 1 will not repeat, but output 8 will produce 8 pulses. With a 5v trigger, you'll get 10ms duty cycle bursts, down to a minimum 1v trigger which produces around 500ms duty cycle bursts. Bursts are one-shot and will not retrigger until all bursts have completed. 
+
+Demo video: [https://youtu.be/_MbU2uUmem0](https://youtu.be/_MbU2uUmem0)
 
 # Getting started
 
