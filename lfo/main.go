@@ -20,7 +20,7 @@ var (
 	}
 
 	// Sleep duration between advancing LFO CVs to uniformly slow down the rate.
-	mellowFactor = time.Millisecond * 20
+	mellowFactor = time.Millisecond * 25
 
 	// The collection of LFO state machines for each output.
 	lfos [8]*LFO
@@ -34,9 +34,9 @@ func main() {
 
 	// Main loop.
 	for {
+		// Capture the cv input to increase the LFO speed.
+		nudge := (uncertainty.Read() / 4)
 		for i, lfo := range lfos {
-			// Capture the cv input to increase the LFO speed.
-			nudge := (uncertainty.Read() / 4)
 			// Calculate next voltage value for this LFO and set the cv output.
 			lfo.Next(nudge / (i + 1))
 		}
