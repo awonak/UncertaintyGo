@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	uncertainty "github.com/awonak/UncertaintyGo"
 )
 
@@ -16,6 +18,9 @@ var (
 		1 << 3,
 		1 << 2,
 	}
+
+	// Sleep duration between advancing LFO CVs to uniformly slow down the rate.
+	mellowFactor = time.Millisecond * 20
 
 	// The collection of LFO state machines for each output.
 	lfos [8]*LFO
@@ -35,5 +40,6 @@ func main() {
 			// Calculate next voltage value for this LFO and set the cv output.
 			lfo.Next(nudge / (i + 1))
 		}
+		time.Sleep(mellowFactor)
 	}
 }
